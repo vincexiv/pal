@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+
+import hashlib
+import random
+import struct
+import zlib
+import re
+
+def shed_hex_notation(hex_string):
+    '''
+    Removes the "0x" part of the hexadecimal string. For instance, calling it 
+    with "0xabcdefgh" will return "abcdef"
+    '''
+
+    return re.sub(r'^0x', '', hex_string)
+
+def spoof_sha_prefix(hex_prefix, path_to_original_png_file, altered_image_path):
+    '''
+    This is a function that takes in the original png file, spoofs it such that its checksum 
+    starts with the desired prefix, but ensures when the image is opened no change is observed. 
+    The altered image is stored in the output.
+
+    Parameters
+    hex_prefix (string): hexadecimal string notation for desired prefix of the checksum
+    path_to_original_png_file (string): Well, this one is self explanatory
+    altered_image_path (string): The spoofed image will be saved here
+    '''
+
+    with open(path_to_original_png_file, 'rb') as f:
+        data = f.read()
+
+    # Verify it's a PNG file
+    if data[:8] != b'\x89PNG\r\n\x1a\n':
+        raise ValueError("Not a valid PNG file.")
+
+    # Find the IEND chunk to insert custom data before it
+    iend_index = data.rfind(b'IEND')
+    if iend_index == -1:
+        raise ValueError("No IEND chunk found in the PNG file.")
+
+    desired_prefix = shed_hex_notation(hex_prefix)
+    prefix_length = len(desired_prefix)
+    trial_count = 0
+
+    while True:
+        trial_count += 1
+        
+        # Create a tEXt chunk with random content
+        random_text = ''.join(random.choices('0123456789abcdef', k=20)).encode('utf-8')
+        text_chunk = b'Comment\x00' + random_text
+
+        # Add the length and CRC for the chunk
+        length = struct.pack(">I", len(text_chunk))
+        crc = struct.pack(">I", zlib.crc32(b'tEXt' + text_chunk))
+        modified_data = data[:iend_index] + length + b'tEXt' + text_chunk + crc + data[iend_index:]
+
+        # Calculate the SHA-512 hash
+        sha512_hash = hashlib.sha512(modified_data).hexdigest()
+
+        # Check if the prefix matches
+        if sha512_hash.startswith(desired_prefix):
+            print(f"Match found after {trial_count} trials: {sha512_hash}")
+            with open(altered_image_path, 'wb') as out_file:
+                out_file.write(modified_data)
+            return sha512_hash
+
+        # Log progress every 1000 trials
+        if trial_count % 1000 == 0:
+            print(f"Trial {trial_count}: Current hash {sha512_hash[:prefix_length]}")
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) != 4:
+        print("Usage: spoof <desired_prefix> <path_to_original_png_file> <altered_image_path>")
+        sys.exit(1)
+
+    spoof_sha_prefix(sys.argv[1], sys.argv[2], sys.argv[3])
