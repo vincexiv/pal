@@ -41,8 +41,8 @@ def render_text(my_window, x_coord, y_coord, color_index, text):
     my_window.addstr(x_coord, y_coord, text)
     return my_window
 
-def move_cursor(my_window, x_coord, y_coord):
-    my_window.move(x_coord, y_coord)
+def move_cursor(screen, my_window, x_coord, y_coord):
+    screen.move(x_coord, y_coord)
     return my_window
 
 def draw_at_cursor(my_window, char_to_draw = '|', color_index = 1):
@@ -92,6 +92,7 @@ def run_command(screen, my_window, command, command_args):
     elif command == 5:
         x_coord, y_coord = command_args
         return move_cursor(
+            screen = screen,
             my_window = my_window,
             x_coord = x_coord,
             y_coord = y_coord
@@ -122,7 +123,7 @@ def paint_screen(screen, binary_data):
         end = start + command_byte_length
         command_args = binary_data[start:end]
 
-        if count <= 10:
+        if count <= 12:
             my_window = run_command(screen, my_window, command, command_args) 
         else:
             break   

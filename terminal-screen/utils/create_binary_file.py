@@ -11,7 +11,7 @@ def draw_character(x_coord = 1, y_coord = 1, color_index = 1, char_to_display = 
 def draw_line(x1_coord = 2, y1_coord = 1, x2_coord = 98, y2_coord = 1, color_index = 1, char_to_use = '+'):
     return [3, 6, x1_coord, y1_coord, x2_coord, y2_coord, color_index, ord(char_to_use)]
 
-def render_text(x_coord = 15, y_coord = 15, color_index = 1, text = 'Hey'):
+def render_text(x_coord = 3, y_coord = 3, color_index = 1, text = 'Hey'):
     text_data = [ord(char) for char in text]
     return [4, 3 + len(text_data), x_coord, y_coord, color_index] + text_data
 
@@ -74,6 +74,7 @@ if __name__ == "__main__":
     try:
         actions = [
             screen_setup(),
+            move_cursor(2, 2),
             draw_character(1, 1, 1, '+'),
             draw_line(2, 1, 98, 1, 1, '-'),
             draw_character(1, 98, 1, '+'),
@@ -83,7 +84,7 @@ if __name__ == "__main__":
             draw_character(13, 98, 1, '+'),
             draw_line(1, 2, 1, 13, 1, '|'),
             render_text(3, 3, 1, text),
-            move_cursor(5, 5),
+            move_cursor(3, 3 + len(text)),
             draw_at_cursor(),
             clear_screen()
         ]
