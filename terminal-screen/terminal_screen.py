@@ -37,12 +37,13 @@ def draw_line(my_window, x1_coord, y1_coord, x2_coord, y2_coord, color_index, ch
         
     return my_window
 
-def render_text(my_window, x_coord = 15, y_coord = 15, color_index = 1, text = 'Hey'):
-    text_data = [ord(char) for char in text]
-    return [4, 3 + len(text_data), x_coord, y_coord, color_index] + text_data
+def render_text(my_window, x_coord, y_coord, color_index, text):
+    my_window.addstr(x_coord, y_coord, text)
+    return my_window
 
-def move_cursor(my_window, x_coord = 25, y_coord = 25):
-    return [5, 2, x_coord, y_coord]
+def move_cursor(my_window, x_coord, y_coord):
+    my_window.move(x_coord, y_coord)
+    return my_window
 
 def draw_at_cursor(my_window, char_to_draw = '|', color_index = 1):
     return [6, 2, ord(char_to_draw), color_index]
@@ -50,7 +51,7 @@ def draw_at_cursor(my_window, char_to_draw = '|', color_index = 1):
 def clear_screen():
     return [255] # Resolves to 0xFF
 
-def run_command(my_window, command, command_args):
+def run_command(screen, my_window, command, command_args):
     if command == 1:
         width, height, color_mode = command_args
         return screen_setup(
@@ -80,13 +81,13 @@ def run_command(my_window, command, command_args):
             char_to_use = chr(char_to_use)
         )
     elif command == 4:
-        x_coord, y_coord, color_index, text = command_args
+        x_coord, y_coord, color_index, *text = command_args
         return render_text(
             my_window = my_window,
             x_coord = x_coord,
             y_coord = y_coord,
             color_index = color_index,
-            text = text
+            text = ''.join([chr(c) for c in text])
         )
     elif command == 5:
         x_coord, y_coord = command_args
@@ -121,8 +122,8 @@ def paint_screen(screen, binary_data):
         end = start + command_byte_length
         command_args = binary_data[start:end]
 
-        if count <= 9:
-            my_window = run_command(my_window, command, command_args) 
+        if count <= 10:
+            my_window = run_command(screen, my_window, command, command_args) 
         else:
             break   
 

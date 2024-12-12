@@ -15,7 +15,7 @@ def render_text(x_coord = 15, y_coord = 15, color_index = 1, text = 'Hey'):
     text_data = [ord(char) for char in text]
     return [4, 3 + len(text_data), x_coord, y_coord, color_index] + text_data
 
-def move_cursor(x_coord = 25, y_coord = 25):
+def move_cursor(x_coord = 5, y_coord = 5):
     return [5, 2, x_coord, y_coord]
 
 def draw_at_cursor(char_to_draw = '#', color_index = 1):
@@ -82,8 +82,8 @@ if __name__ == "__main__":
             draw_line(2, 13, 98, 13, 1, '-'),
             draw_character(13, 98, 1, '+'),
             draw_line(1, 2, 1, 13, 1, '|'),
-            render_text(15, 15, 1, text),
-            move_cursor(),
+            render_text(3, 3, 1, text),
+            move_cursor(5, 5),
             draw_at_cursor(),
             clear_screen()
         ]
