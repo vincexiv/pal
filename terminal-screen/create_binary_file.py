@@ -8,7 +8,7 @@ def screen_setup(width = 100, height = 15, color_mode = 0):
 def draw_character(x_coord = 1, y_coord = 1, color_index = 1, char_to_display = '+'):
     return [2, 4, x_coord, y_coord, color_index, ord(char_to_display)]
 
-def draw_line(x1_coord = 2, y1_coord = 1, x2_coord = 98, y2_coord = 1, color_index = 1, char_to_use = '+'):
+def draw_line(x1_coord = 2, y1_coord = 1, x2_coord = 48, y2_coord = 1, color_index = 1, char_to_use = '+'):
     return [3, 6, x1_coord, y1_coord, x2_coord, y2_coord, color_index, ord(char_to_use)]
 
 def render_text(x_coord = 3, y_coord = 3, color_index = 1, text = "Hello"):
@@ -78,13 +78,12 @@ def create_binary_file(file_name, data):
         print(f"An error occurred while creating the binary file: {e}")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: ./create_binary_file.py <file_name> <your_name>")
+    if len(sys.argv) != 2:
+        print("Usage: ./create_binary_file.py <your_name>")
         sys.exit(1)
 
     # Extract command-line arguments
-    file_name = sys.argv[1]
-    name = sys.argv[2]
+    name = sys.argv[1]
     text = f"Hello {name},"
     message = 'I hope you are doing great'
 
@@ -93,12 +92,12 @@ if __name__ == "__main__":
             screen_setup(),
             move_cursor(2, 2),
             draw_character(1, 1, 1, '+'),
-            draw_line(2, 1, 98, 1, 1, '-'),
-            draw_character(1, 98, 1, '+'),
-            draw_line(98, 2, 98, 13, 1, '|'),
+            draw_line(2, 1, 48, 1, 1, '-'),
+            draw_character(1, 48, 1, '+'),
+            draw_line(48, 2, 48, 13, 1, '|'),
             draw_character(13, 1, 1, '+'),
-            draw_line(2, 13, 98, 13, 1, '-'),
-            draw_character(13, 98, 1, '+'),
+            draw_line(2, 13, 48, 13, 1, '-'),
+            draw_character(13, 48, 1, '+'),
             draw_line(1, 2, 1, 13, 1, '|'),
             render_text(3, 3, 1, text),
             move_cursor(3, 3 + len(text)),
@@ -118,4 +117,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # Call the function to create the binary file
-    create_binary_file(file_name, binary_data)
+    create_binary_file('./commands.bin', binary_data)

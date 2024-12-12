@@ -154,7 +154,7 @@ if __name__ == "__main__":
         print("Usage: ./terminal_screen.py")
         sys.exit(1)
 
-    file_path = './utils/command.bin'
+    file_path = './commands.bin'
 
     try:
         with open(file_path, 'rb') as file:
