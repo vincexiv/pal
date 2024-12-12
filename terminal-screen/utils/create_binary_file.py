@@ -11,7 +11,7 @@ def draw_character(x_coord = 1, y_coord = 1, color_index = 1, char_to_display = 
 def draw_line(x1_coord = 2, y1_coord = 1, x2_coord = 98, y2_coord = 1, color_index = 1, char_to_use = '+'):
     return [3, 6, x1_coord, y1_coord, x2_coord, y2_coord, color_index, ord(char_to_use)]
 
-def render_text(x_coord = 3, y_coord = 3, color_index = 1, text = 'Hey'):
+def render_text(x_coord = 3, y_coord = 3, color_index = 1, text = "Hello"):
     text_data = [ord(char) for char in text]
     return [4, 3 + len(text_data), x_coord, y_coord, color_index] + text_data
 
@@ -64,12 +64,13 @@ def create_binary_file(file_name, data):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: ./create_binary_file.py <file_name> <text>")
+        print("Usage: ./create_binary_file.py <file_name> <your_name>")
         sys.exit(1)
 
     # Extract command-line arguments
     file_name = sys.argv[1]
-    text = sys.argv[2]
+    name = sys.argv[2]
+    text = f"Hello {name},"
 
     try:
         actions = [
