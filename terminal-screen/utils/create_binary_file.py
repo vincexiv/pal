@@ -2,13 +2,13 @@
 
 import sys
 
-def screen_setup(width = 200, height = 50, color_mode = 0):
+def screen_setup(width = 100, height = 15, color_mode = 0):
     return [1, 3, width, height, color_mode]
 
-def draw_character(x_coord = 20, y_coord = 20, color_index = 1, char_to_display = '+'):
+def draw_character(x_coord = 1, y_coord = 1, color_index = 1, char_to_display = '+'):
     return [2, 4, x_coord, y_coord, color_index, ord(char_to_display)]
 
-def draw_line(x1_coord = 5, y1_coord = 5, x2_coord = 195, y2_coord = 45, color_index = 1, char_to_use = '-'):
+def draw_line(x1_coord = 2, y1_coord = 1, x2_coord = 98, y2_coord = 1, color_index = 1, char_to_use = '+'):
     return [3, 6, x1_coord, y1_coord, x2_coord, y2_coord, color_index, ord(char_to_use)]
 
 def render_text(x_coord = 15, y_coord = 15, color_index = 1, text = 'Hey'):
@@ -18,7 +18,7 @@ def render_text(x_coord = 15, y_coord = 15, color_index = 1, text = 'Hey'):
 def move_cursor(x_coord = 25, y_coord = 25):
     return [5, 2, x_coord, y_coord]
 
-def draw_at_cursor(char_to_draw = '+', color_index = 1):
+def draw_at_cursor(char_to_draw = '#', color_index = 1):
     return [6, 2, ord(char_to_draw), color_index]
 
 def clear_screen():
@@ -74,8 +74,14 @@ if __name__ == "__main__":
     try:
         actions = [
             screen_setup(),
-            draw_character(),
-            draw_line(),
+            draw_character(1, 1, 1, '+'),
+            draw_line(2, 1, 98, 1, 1, '-'),
+            draw_character(1, 98, 1, '+'),
+            draw_line(98, 2, 98, 13, 1, '|'),
+            draw_character(13, 1, 1, '+'),
+            draw_line(2, 13, 98, 13, 1, '-'),
+            draw_character(13, 98, 1, '+'),
+            draw_line(1, 2, 1, 13, 1, '|'),
             render_text(15, 15, 1, text),
             move_cursor(),
             draw_at_cursor(),
