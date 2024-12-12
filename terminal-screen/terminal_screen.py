@@ -5,6 +5,7 @@ import subprocess
 import sys
 import curses
 import os
+import time
 
 def screen_setup(my_window, width, height, color_mode):
     my_window = curses.newwin(height, width, 0, 0)
@@ -48,8 +49,22 @@ def move_cursor(screen, my_window, x_coord, y_coord):
 def draw_at_cursor(my_window, char_to_draw = '|', color_index = 1):
     return [6, 2, ord(char_to_draw), color_index]
 
-def clear_screen():
-    return [255] # Resolves to 0xFF
+def sleep(my_window, sleep_time):
+    time.sleep(sleep_time)
+    return my_window
+
+def clear_screen(screen):
+    # Pause for a moment to show the message
+    screen.getch()
+
+    # Clear the screen before exiting
+    screen.clear()
+    screen.addstr(0, 0, "Goodbye!\n")
+    screen.refresh()
+
+    curses.endwin()
+
+    return my_window
 
 def run_command(screen, my_window, command, command_args):
     if command == 1:
@@ -98,14 +113,12 @@ def run_command(screen, my_window, command, command_args):
             y_coord = y_coord
         )
     elif command == 6:
-        char_to_draw, color_index = command_args
-        return draw_at_cursor(
+        return sleep(
             my_window = my_window,
-            char_to_draw = char_to_draw,
-            color_index = color_index
+            sleep_time = command_args[0]
         )
     elif command == 255:
-        return clear_screen()
+        return clear_screen(screen)
 
 def paint_screen(screen, binary_data):
     # my_window.clear()
@@ -123,10 +136,10 @@ def paint_screen(screen, binary_data):
         end = start + command_byte_length
         command_args = binary_data[start:end]
 
-        if count <= 12:
-            my_window = run_command(screen, my_window, command, command_args) 
-        else:
-            break   
+        my_window = run_command(screen, my_window, command, command_args)  
+
+        if command == 255: # 255 is designated end of file
+            break
 
         index = end
         command = binary_data[index]

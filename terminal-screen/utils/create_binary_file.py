@@ -18,11 +18,26 @@ def render_text(x_coord = 3, y_coord = 3, color_index = 1, text = "Hello"):
 def move_cursor(x_coord = 5, y_coord = 5):
     return [5, 2, x_coord, y_coord]
 
-def draw_at_cursor(char_to_draw = '#', color_index = 1):
-    return [6, 2, ord(char_to_draw), color_index]
+def sleep(sleep_time = 3):
+    return [6, 1, sleep_time]
+
+def text_type(text, y_coord, x_coord):
+    result = []
+    x = x_coord
+    y = y_coord
+    for c in text:
+        result.append(sleep(1))
+        result.append(render_text(y, x, 1, c))
+        result.append(move_cursor(y, x + 1))
+
+        x += 1
+    breakpoint()
+
+    return result
+        
 
 def clear_screen():
-    return [255] # Resolves to 0xFF
+    return [255, 0] # Resolves to 0xFF
 
 def get_binary_data(commands):
     '''
@@ -71,6 +86,7 @@ if __name__ == "__main__":
     file_name = sys.argv[1]
     name = sys.argv[2]
     text = f"Hello {name},"
+    message = 'I hope you are doing great'
 
     try:
         actions = [
@@ -86,7 +102,13 @@ if __name__ == "__main__":
             draw_line(1, 2, 1, 13, 1, '|'),
             render_text(3, 3, 1, text),
             move_cursor(3, 3 + len(text)),
-            draw_at_cursor(),
+            sleep(1),
+            move_cursor(5, 3),
+            render_text(5, 3, 1, message),
+            move_cursor(5, 3 + len(message)),
+            sleep(1),
+            render_text(11, 3, 1, "Press Enter to exit"),
+            sleep(2),
             clear_screen()
         ]
 
