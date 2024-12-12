@@ -38,7 +38,7 @@ def get_binary_data(commands):
         [255]
     ]
 
-    Calling this method with the above arguments will return b'\x01\x03\n\x14\x02\x07\x00'
+    Calling this method with the above arguments will return b'\x01\x03\xc82\x01\xff'
     '''
 
     result = []
