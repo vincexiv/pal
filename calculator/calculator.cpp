@@ -308,7 +308,7 @@ int main() {
             std::string result = vectorToString(bigIntResult.digits);
             std::cout << result << std::endl;
         } else {
-            std::cout << "Operator not supported" << std::endl;
+            std::cout << "Operator " + op + " is not supported" << std::endl;
         }
     }
 
