@@ -1,9 +1,12 @@
-## Compile
+## About
+This is an arbitrary-precision-integer calculator made in C++ (a language that doesn't have native support for it)
+
+## Compile the project
 `g++ calculator.cpp -o calculator`
 
-## Run the app in REPL
+## Run the app
 `./calculator <first big number> <operator> <second big number>` <br/>
-Enter your expressions
+The above command opens a REPL where you can enter expressions and get your responses back
 
 ## Reservations
 - Doesn't work with decimal places as at now
