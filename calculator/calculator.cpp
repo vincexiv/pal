@@ -7,7 +7,8 @@
 #include <stack>
 
 class BigInt {
-    BigInt subtract(const BigInt& a, const BigInt& b){
+    // Only sibtracts the digits, doesn't consider sign (whether positive or negative)
+    BigInt subtract(const BigInt& a, const BigInt& b) const {
         BigInt result;
         
         int borrow = 0;
@@ -32,6 +33,52 @@ class BigInt {
         }
 
         return result;
+    }
+
+    // Only adds the digits, doesn't consider sign (whether positive or negative)
+    BigInt add(const BigInt& other) const {
+        BigInt result;
+        int carry = 0;
+        size_t i = 0;
+        while (i < digits.size() || i < other.digits.size() || carry) {
+            int sum = carry;
+            if (i < digits.size()) sum += digits[i];
+            if (i < other.digits.size()) sum += other.digits[i];
+            result.digits.push_back(sum % 10);
+            carry = sum / 10;
+            ++i;
+        }
+        return result;
+    }
+
+    // Only compares the digits, not signs
+    bool less_than(const BigInt& other) const {
+        if (digits.size() != other.digits.size()) {
+            return digits.size() < other.digits.size();
+        }
+
+        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+            if (*it1 != *it2) {
+                return *it1 < *it2;
+            }
+        }
+
+        return false;
+    }
+
+    // Only compares the digits, not sign
+    bool greater_than(const BigInt& other) const {
+        if (digits.size() != other.digits.size()) {
+            return digits.size() > other.digits.size();
+        }
+
+        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+            if (*it1 != *it2) {
+                return *it1 > *it2;
+            }
+        }
+
+        return false;
     }
 public:
     // Stores digits of the number in reverse order
@@ -88,32 +135,65 @@ public:
 
     // Addition
     BigInt operator+(const BigInt& other) const {
-        BigInt result;
-        int carry = 0;
-        size_t i = 0;
-        while (i < digits.size() || i < other.digits.size() || carry) {
-            int sum = carry;
-            if (i < digits.size()) sum += digits[i];
-            if (i < other.digits.size()) sum += other.digits[i];
-            result.digits.push_back(sum % 10);
-            carry = sum / 10;
-            ++i;
+        if(this->_sign == other._sign){
+            BigInt result = this->add(other);
+            result._sign = this->_sign;
+            return result;
+        } else {
+            if(this->_sign == '+'){
+                BigInt _other = other;
+                _other._sign = '+';
+                return *this - other;
+            } else {
+                BigInt _this = *this;
+                _this._sign = '+';
+                return other - _this;
+            }
         }
-        return result;
     }
 
     // Subtraction
-    BigInt operator-(const BigInt& other) {
-        BigInt a = *this;
-        BigInt b = other;
-
+    BigInt operator-(const BigInt& other) const {
         BigInt result;
 
-        if(*this < other){
-            result = this->subtract(b, a);
-            result._sign= '-';
-        } else {
-            result = this->subtract(a, b);
+        if(this->_sign == '+' && other._sign == '+'){
+            BigInt a = *this;
+            BigInt b = other;
+            
+            if(a.less_than(b)){
+                result = this->subtract(b, a);
+                result._sign= '-';
+            } else {
+                result = this->subtract(a, b);
+            }
+
+            return result;
+        } else if (this->_sign == '-' && other._sign == '-'){
+            BigInt a = other;
+            BigInt b = *this;
+            a._sign = '+';
+
+            if(a.less_than(b)){
+                result = this->subtract(b, a);
+                result._sign= '-';
+            } else {
+                result = this->subtract(a, b);
+            }
+
+            return result;
+        } else if (this->_sign == '+' && other._sign == '-') {
+            BigInt a = *this;
+            BigInt b = other;
+            b._sign = '+';
+            result = a + b;
+            result._sign = '+';
+            return result;
+        } else if (this->_sign == '-' && other._sign == '+') {
+            BigInt a = *this;
+            BigInt b = other;
+            result = a.add(b);
+            result._sign = '-';
+            return result;
         }
 
         return result;
@@ -365,7 +445,7 @@ BigInt evaluatePostfix(const std::vector<std::string>& postfix) {
     std::stack<BigInt> stack;
 
     for (const std::string& token : postfix) {
-        if (isdigit(token[0])) {
+        if (isdigit(token[0]) || isdigit(token[1])) {
             stack.push(BigInt(token));
         } else {
             BigInt b = stack.top(); stack.pop();
@@ -446,7 +526,21 @@ int main() {
         }
 
         std::vector<std::string> tokens = tokenize(input);
+
+        // std::cout << "tokens: ";
+        // for(const std::string& token : tokens){
+        //     std::cout << token << ", ";
+        // }
+        // std::cout << std::endl;
+
         std::vector<std::string> postfix = infixToPostfix(tokens);
+
+        // std::cout << "postfix: ";
+        // for(const std::string& token : postfix){
+        //     std::cout << token << ", ";
+        // }
+        // std::cout << std::endl;
+
         BigInt result = evaluatePostfix(postfix);
         std::cout << result.toString() << std::endl;
     }
