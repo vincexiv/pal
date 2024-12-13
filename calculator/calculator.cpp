@@ -41,7 +41,11 @@ public:
     // Constructor to initialize BigInt from a string
     BigInt(const std::string& num) {
         for (int i = num.size() - 1; i >= 0; --i) {
-            digits.push_back(num[i] - '0');
+            if(i == 0 && num[i] == '-'){
+                _sign = '-';
+            } else {
+                digits.push_back(num[i] - '0');
+            }
         }
     }
 
@@ -54,7 +58,7 @@ public:
         }
     }
 
-    std::string toString() {
+    std::string toString() const {
         std::ostringstream oss;
         oss << "";
 
@@ -161,34 +165,26 @@ public:
 
     // Comparison (>=)
     bool operator>=(const BigInt& other) const {
-        if (digits.size() > other.digits.size()) return true;
-        if (digits.size() < other.digits.size()) return false;
-        for (int i = digits.size() - 1; i >= 0; --i) {
-            if (digits[i] > other.digits[i]) return true;
-            if (digits[i] < other.digits[i]) return false;
-        }
-        return true;
+        return *this > other || *this == other;
     }
 
     // Comparison (<=)
     bool operator<=(const BigInt& other) const {
-        if (digits.size() < other.digits.size()) return true;
-        if (digits.size() > other.digits.size()) return false;
-        for (int i = digits.size() - 1; i >= 0; --i) {
-            if (digits[i] < other.digits[i]) return true;
-            if (digits[i] > other.digits[i]) return false;
-        }
-        return true;
+        return *this < other || *this == other;
     }
 
     // Comparison (==)
     bool operator==(const BigInt& other) const {
-        if (digits.size() > other.digits.size()) return false;
-        if (digits.size() < other.digits.size()) return false;
-        for (int i = digits.size() - 1; i >= 0; --i) {
-            if (digits[i] > other.digits[i]) return false;
-            if (digits[i] < other.digits[i]) return false;
+        if(this->_sign != other._sign || this->digits.size() != other.digits.size()){
+            return false;
         }
+
+        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+            if (*it1 != *it2) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -227,13 +223,29 @@ public:
 
     // Overloaded comparison operators
     bool operator<(const BigInt& other) const {
-        if (digits.size() != other.digits.size()) {
-            return digits.size() < other.digits.size();
-        }
-
-        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
-            if (*it1 != *it2) {
-                return *it1 < *it2;
+        if(this->_sign == '-' && other._sign == '+'){
+            return true;
+        }else if (this->_sign == '+' && other._sign == '-'){
+            return false;
+        } else if (this->_sign == '+' && other._sign == '+'){
+            if(digits.size() != other.digits.size()){
+                return digits.size() < other.digits.size();
+            } else {
+                for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+                    if (*it1 != *it2) {
+                        return *it1 < *it2;
+                    }
+                }
+            }
+        } else if (this->_sign == '-' && other._sign == '-'){
+            if(digits.size() != other.digits.size()){
+                return digits.size() > other.digits.size();
+            } else {
+                for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+                    if (*it1 != *it2) {
+                        return *it1 > *it2;
+                    }
+                }
             }
         }
 
@@ -242,13 +254,29 @@ public:
 
     // Overloaded comparison operators
     bool operator>(const BigInt& other) const {
-        if (digits.size() != other.digits.size()) {
-            return digits.size() > other.digits.size();
-        }
-
-        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
-            if (*it1 != *it2) {
-                return *it1 > *it2;
+        if(this->_sign == '-' && other._sign == '+'){
+            return false;
+        }else if (this->_sign == '+' && other._sign == '-'){
+            return true;
+        } else if (this->_sign == '+' && other._sign == '+'){
+            if(digits.size() != other.digits.size()){
+                return digits.size() > other.digits.size();
+            } else {
+                for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+                    if (*it1 != *it2) {
+                        return *it1 > *it2;
+                    }
+                }
+            }
+        } else if (this->_sign == '-' && other._sign == '-'){
+            if(digits.size() != other.digits.size()){
+                return digits.size() < other.digits.size();
+            } else {
+                for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+                    if (*it1 != *it2) {
+                        return *it1 < *it2;
+                    }
+                }
             }
         }
 
@@ -263,7 +291,7 @@ std::vector<std::string> tokenize(const std::string& expression) {
     std::string _operator;
 
     for (char ch : expression) {
-        if (isdigit(ch)) {
+        if (isdigit(ch) || ch == '.' || ch == '-') {
             _operand += ch;
             if (!_operator.empty()) {
                 tokens.push_back(_operator);
@@ -303,9 +331,8 @@ std::vector<std::string> infixToPostfix(const std::vector<std::string>& tokens) 
     };
 
     for (const std::string& token : tokens) {
-        if (isdigit(token[0])) {
-            output.push_back(token);
-        } else if (isOperator(token)) {
+
+        if (isOperator(token)) {
             while (!operators.empty() && precedence(operators.top()) >= precedence(token)) {
                 output.push_back(operators.top());
                 operators.pop();
@@ -319,6 +346,8 @@ std::vector<std::string> infixToPostfix(const std::vector<std::string>& tokens) 
                 operators.pop();
             }
             operators.pop();
+        } else {
+            output.push_back(token);
         }
     }
 
@@ -372,6 +401,10 @@ int main() {
         std::cout << "> ";
         std::getline(std::cin, input);
 
+        // Parse the input into arguments
+        std::istringstream iss(input);
+        std::vector<std::string> args = tokenize(input);
+
         // Check for exit condition
         if (input == "exit") {
             std::cout << "Goodbye!\n";
@@ -384,9 +417,6 @@ int main() {
         bool doingComparison =  greater || less || equal;
 
         if(doingComparison){
-            // Parse the input into arguments
-            std::istringstream iss(input);
-            std::vector<std::string> args = tokenize(input);
 
             if(args.size() != 3){
                 std::cout << "Invalid expression" << std::endl;
