@@ -2,7 +2,7 @@
 This is an arbitrary-precision-integer calculator made in C++ (a language that doesn't have native support for it)
 
 ## Compile the project
-`g++ calculator.cpp -o calculator`
+`g++ calculator.cpp -o calculator` <br/>
 
 ## Run the app
 `./calculator <first big number> <operator> <second big number>` <br/>
