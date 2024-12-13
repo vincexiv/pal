@@ -137,6 +137,44 @@ public:
         }
         return true;
     }
+
+    // Comparison (<=)
+    bool operator<=(const BigInt& other) const {
+        if (digits.size() < other.digits.size()) return true;
+        if (digits.size() > other.digits.size()) return false;
+        for (int i = digits.size() - 1; i >= 0; --i) {
+            if (digits[i] < other.digits[i]) return true;
+            if (digits[i] > other.digits[i]) return false;
+        }
+        return true;
+    }
+
+    // Comparison (==)
+    bool operator==(const BigInt& other) const {
+        if (digits.size() > other.digits.size()) return false;
+        if (digits.size() < other.digits.size()) return false;
+        for (int i = digits.size() - 1; i >= 0; --i) {
+            if (digits[i] > other.digits[i]) return false;
+            if (digits[i] < other.digits[i]) return false;
+        }
+        return true;
+    }
+
+   // Overloaded modulo operator
+    BigInt operator%(const BigInt& other) const {
+        if (other == BigInt("0")) {
+            throw std::runtime_error("Modulo by zero");
+        }
+
+        BigInt dividend = *this;
+        BigInt divisor = other;
+
+        while (dividend >= divisor) {
+            dividend = dividend - divisor;
+        }
+
+        return dividend;
+    }
 };
 
 
@@ -165,35 +203,53 @@ int main() {
             args.push_back(arg);
         }
 
-        BigInt num1(args[0]);
-        BigInt num2(args[2]);
-        char op = args[1][0];
-
-        BigInt bigIntResult;
-        std::string result;
-
-        switch (op) {
-            case '+':
-                bigIntResult = num1 + num2;
-                result = vectorToString(bigIntResult.digits);
-                break;
-            case '-':
-                bigIntResult = num1 - num2;
-                result = vectorToString(bigIntResult.digits);
-                break;
-            case '/':
-                bigIntResult = num1 / num2;
-                result = vectorToString(bigIntResult.digits);
-                break;
-            case '*':
-                bigIntResult = num1 * num2;
-                result = vectorToString(bigIntResult.digits);
-                break;
-            default:
-                break;
+        if(args.size() < 3){
+            std::string m1 = "Invalid input. ";
+            std::string m2 = "Did you forget to include a space between the operands and the operator?";
+            std::cout << m1 << m2 << std::endl;
+            continue;
+        } else if (args.size() > 3) {
+            std::string m1 = "Invalid input. ";
+            std::string m2 = "Only two operands and an operator supported (for now)";
+            std::cout << m1 << m2 << std::endl;
+            continue;
         }
 
-        std::cout << result << std::endl;
+        BigInt num1(args[0]);
+        BigInt num2(args[2]);
+        std::string op = args[1];
+
+        if(op == "+"){
+            BigInt bigIntResult = num1 + num2;
+            std::string result = vectorToString(bigIntResult.digits);
+            std::cout << result << std::endl;
+        } else if (op == "-") {
+            BigInt bigIntResult = num1 - num2;
+            std::string result = vectorToString(bigIntResult.digits);
+            std::cout << result << std::endl;
+        } else if (op == "/"){
+            BigInt bigIntResult = num1 / num2;
+            std::string result = vectorToString(bigIntResult.digits);
+            std::cout << result << std::endl;
+        } else if (op == "*") {
+            BigInt bigIntResult = num1 * num2;
+            std::string result = vectorToString(bigIntResult.digits);
+            result = vectorToString(bigIntResult.digits);
+            std::cout << result << std::endl;
+        } else if (op == ">=") {
+            bool result = num1 >= num2;
+            std::cout << result << std::endl;
+        } else if (op == "<=") {
+            bool result = num1 <= num2;
+            std::cout << result << std::endl;
+        } else if (op == "==") {
+            bool result = num1 == num2;
+            std::cout << result << std::endl;
+        } else if (op == "%") {
+            BigInt bigIntResult = num1 % num2;
+            std::string result = vectorToString(bigIntResult.digits);
+            std::cout << result << std::endl;
+        }
     }
 
     return 0;
