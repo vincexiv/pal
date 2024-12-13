@@ -175,6 +175,54 @@ public:
 
         return dividend;
     }
+
+    // Power operator
+    BigInt operator^(const BigInt& exponent) const {
+        BigInt result("1");
+        BigInt base = *this;
+        BigInt exp = exponent;
+
+        while (exp > BigInt("0")) {
+            if ((exp % BigInt("2")) == BigInt("1")) {
+                result = result * base;
+            }
+            base = base * base;
+            exp = exp / BigInt("2");
+        }
+
+        return result;
+    }
+
+    // Overloaded comparison operators
+    bool operator<(const BigInt& other) const {
+        if (digits.size() != other.digits.size()) {
+            return digits.size() < other.digits.size();
+        }
+
+        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+            if (*it1 != *it2) {
+                return *it1 < *it2;
+            }
+        }
+
+        return false;
+    }
+
+    // Overloaded comparison operators
+    bool operator>(const BigInt& other) const {
+        if (digits.size() != other.digits.size()) {
+            return digits.size() > other.digits.size();
+        }
+
+        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+            if (*it1 != *it2) {
+                return *it1 > *it2;
+            }
+        }
+
+        return false;
+    }
+
 };
 
 
@@ -242,6 +290,12 @@ int main() {
         } else if (op == "<=") {
             bool result = num1 <= num2;
             std::cout << result << std::endl;
+        } else if (op == ">") {
+            bool result = num1 > num2;
+            std::cout << result << std::endl;
+        } else if (op == "<") {
+            bool result = num1 < num2;
+            std::cout << result << std::endl;
         } else if (op == "==") {
             bool result = num1 == num2;
             std::cout << result << std::endl;
@@ -249,6 +303,12 @@ int main() {
             BigInt bigIntResult = num1 % num2;
             std::string result = vectorToString(bigIntResult.digits);
             std::cout << result << std::endl;
+        } else if (op == "^") {
+            BigInt bigIntResult = num1 ^ num2;
+            std::string result = vectorToString(bigIntResult.digits);
+            std::cout << result << std::endl;
+        } else {
+            std::cout << "Operator not supported" << std::endl;
         }
     }
 
