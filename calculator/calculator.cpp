@@ -80,6 +80,16 @@ class BigInt {
 
         return false;
     }
+
+    bool equal(const BigInt& other) const {
+        for (auto it1 = digits.rbegin(), it2 = other.digits.rbegin(); it1 != digits.rend(); ++it1, ++it2) {
+            if (*it1 != *it2) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 public:
     // Stores digits of the number in reverse order
     std::vector<int> digits;
@@ -216,6 +226,15 @@ public:
             result.digits.pop_back();
         }
 
+        char result_sign;
+        if(this->_sign == other._sign){
+            result_sign = '+';
+        } else {
+            result_sign = '-';
+        }
+
+        result._sign = result_sign;
+
         return result;
     }
 
@@ -225,8 +244,8 @@ public:
         for (int i = digits.size() - 1; i >= 0; --i) {
             remainder.digits.insert(remainder.digits.begin(), digits[i]);
             int quotient = 0;
-            while (remainder >= other) {
-                remainder = remainder - other;
+            while (remainder.greater_than(other) || remainder.equal(other)) {
+                remainder = this->subtract(remainder, other);
                 quotient++;
             }
             result.digits.push_back(quotient);
@@ -239,6 +258,15 @@ public:
         while (result.digits.size() > 1 && result.digits.back() == 0) {
             result.digits.pop_back();
         }
+
+        char result_sign;
+        if(this->_sign == other._sign){
+            result_sign = '+';
+        } else {
+            result_sign = '-';
+        }
+
+        result._sign = result_sign;
 
         return result;
     }
