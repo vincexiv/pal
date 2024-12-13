@@ -7,6 +7,32 @@
 #include <stack>
 
 class BigInt {
+    BigInt subtract(const BigInt& a, const BigInt& b){
+        BigInt result;
+        
+        int borrow = 0;
+        size_t i = 0;
+        while (i < a.digits.size() || i < b.digits.size()) {
+            int diff = borrow;
+            if (i < a.digits.size()) diff +=a.digits[i];
+            if (i < b.digits.size()) diff -= b.digits[i];
+            if (diff < 0) {
+                diff += 10;
+                borrow = -1;
+            } else {
+                borrow = 0;
+            }
+            result.digits.push_back(diff);
+            ++i;
+        }
+
+        // Remove leading zeros
+        while (result.digits.size() > 1 && result.digits.back() == 0) {
+            result.digits.pop_back();
+        }
+
+        return result;
+    }
 public:
     // Stores digits of the number in reverse order
     std::vector<int> digits;
@@ -80,30 +106,10 @@ public:
         BigInt result;
 
         if(*this < other){
+            result = this->subtract(b, a);
             result._sign= '-';
-            a = other;
-            b = *this;
-        }
-
-        int borrow = 0;
-        size_t i = 0;
-        while (i < a.digits.size() || i < b.digits.size()) {
-            int diff = borrow;
-            if (i < a.digits.size()) diff +=a.digits[i];
-            if (i < b.digits.size()) diff -= b.digits[i];
-            if (diff < 0) {
-                diff += 10;
-                borrow = -1;
-            } else {
-                borrow = 0;
-            }
-            result.digits.push_back(diff);
-            ++i;
-        }
-
-        // Remove leading zeros
-        while (result.digits.size() > 1 && result.digits.back() == 0) {
-            result.digits.pop_back();
+        } else {
+            result = this->subtract(a, b);
         }
 
         return result;
