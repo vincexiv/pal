@@ -6,21 +6,11 @@
 #include <stdexcept>
 #include <stack>
 
-
-
-std::string vectorToString(const std::vector<int>& vec) {
-    std::ostringstream oss;
-    oss << "";
-    for (size_t i = 0; i < vec.size(); ++i) {
-        oss << vec[vec.size() - i - 1];
-    }
-    return oss.str();
-}
-
 class BigInt {
 public:
     // Stores digits of the number in reverse order
     std::vector<int> digits;
+    char _sign = '+';
 
     // Constructor to initialize BigInt from a string
     BigInt(const std::string& num) {
@@ -36,6 +26,20 @@ public:
         } else {
             digits.push_back(0);
         }
+    }
+
+    std::string toString() {
+        std::ostringstream oss;
+        oss << "";
+
+        if(this->_sign == '-'){
+            oss << this->_sign;
+        }
+        
+        for (size_t i = 0; i < digits.size(); ++i) {
+            oss << digits[digits.size() - i - 1];
+        }
+        return oss.str();
     }
 
     // Constructor for zero BigInt
@@ -69,14 +73,24 @@ public:
     }
 
     // Subtraction
-    BigInt operator-(const BigInt& other) const {
+    BigInt operator-(const BigInt& other) {
+        BigInt a = *this;
+        BigInt b = other;
+
         BigInt result;
+
+        if(*this < other){
+            result._sign= '-';
+            a = other;
+            b = *this;
+        }
+
         int borrow = 0;
         size_t i = 0;
-        while (i < digits.size() || i < other.digits.size()) {
+        while (i < a.digits.size() || i < b.digits.size()) {
             int diff = borrow;
-            if (i < digits.size()) diff += digits[i];
-            if (i < other.digits.size()) diff -= other.digits[i];
+            if (i < a.digits.size()) diff +=a.digits[i];
+            if (i < b.digits.size()) diff -= b.digits[i];
             if (diff < 0) {
                 diff += 10;
                 borrow = -1;
@@ -398,7 +412,7 @@ int main() {
         std::vector<std::string> tokens = tokenize(input);
         std::vector<std::string> postfix = infixToPostfix(tokens);
         BigInt result = evaluatePostfix(postfix);
-        std::cout << vectorToString(result.digits) << std::endl;
+        std::cout << result.toString() << std::endl;
     }
 
     return 0;
