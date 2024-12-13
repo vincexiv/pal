@@ -368,6 +368,10 @@ int main() {
             std::istringstream iss(input);
             std::vector<std::string> args = tokenize(input);
 
+            if(args.size() != 3){
+                std::cout << "Invalid expression" << std::endl;
+            }
+
             BigInt num1(args[0]);
             BigInt num2(args[2]);
             std::string op = args[1];
